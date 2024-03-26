@@ -27,6 +27,7 @@ initialize(start_location, _, object_width) = (start_location, getwindow(object_
 
 function track(file::AbstractString, start::Real, stop::Real; start_location::Union{Missing, NTuple{2, Int}} = missing, object_width::Int = 60)
     vid = openvideo(file, target_format=VideoIO.AV_PIX_FMT_GRAY8)
+    read(vid)
     t₀ = gettime(vid)
     start += t₀
     stop += t₀
