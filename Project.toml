@@ -1,7 +1,7 @@
 name = "SimpTrack"
 uuid = "cbfce16d-aa61-4ea5-b8a8-99ca74cb25a4"
 authors = ["Yakir Gagnon <12.yakir@gmail.com>"]
-version = "0.1.1"
+version = "0.2.1"
 
 [deps]
 ImageFiltering = "6a3955dd-da59-5b1f-98d4-e7296123deb5"

@@ -17,12 +17,20 @@ function getwindow(object_width)
     window = -w:w
 end
 
+function initialize(::Missing, vid, object_width)
+    guess = reverse(out_frame_size(vid)) .÷ 2
+    initial_window = getwindow(2object_width)
+    return (guess, initial_window)
+end
+
+initialize(start_location, _, object_width) = (start_location, getwindow(object_width))
+
 function track(file::AbstractString, start::Real, stop::Real; start_location::Union{Missing, NTuple{2, Int}} = missing, object_width::Int = 60)
     vid = openvideo(file, target_format=VideoIO.AV_PIX_FMT_GRAY8)
     seek(vid, start)
-    guess = ismissing(start_location) ? reverse(out_frame_size(vid)) .÷ 2 : start_location
     σ = object_width/2.355
-    coords = [get_next(guess, read(vid), getwindow(2object_width), σ)]
+    guess, initial_window = initialize(start_location, vid, object_width)
+    coords = [get_next(guess, read(vid), initial_window, σ)]
     t = [gettime(vid)]
     window = getwindow(object_width)
     for img in vid
