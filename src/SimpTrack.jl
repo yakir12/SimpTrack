@@ -27,6 +27,9 @@ initialize(start_location, _, object_width) = (start_location, getwindow(object_
 
 function track(file::AbstractString, start::Real, stop::Real; start_location::Union{Missing, NTuple{2, Int}} = missing, object_width::Int = 60)
     vid = openvideo(file, target_format=VideoIO.AV_PIX_FMT_GRAY8)
+    t₀ = gettime(vid)
+    start += t₀
+    stop += t₀
     seek(vid, start)
     σ = object_width/2.355
     guess, initial_window = initialize(start_location, vid, object_width)
