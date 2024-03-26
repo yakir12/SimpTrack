@@ -44,7 +44,7 @@ function track(file::AbstractString, start::Real, stop::Real; start_location::Un
             break
         end
     end
-    return t, coords
+    return t .- t₀, coords
 end
 
 end # module SimpTrack
