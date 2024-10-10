@@ -4,11 +4,12 @@ using VideoIO, OffsetArrays, ImageFiltering
 
 export track
 
-function get_next(guess::NTuple{2, Int}, img, window, σ)
+function get_next(guess::NTuple{2, Int}, img, window, σ, m, M)
     frame = OffsetArrays.centered(img, guess)[window]
     x = imfilter(frame, -Kernel.DoG(σ))
     _, i = findmax(x)
-    guess .+ Tuple(window[i])
+    _guess = guess .+ Tuple(window[i])
+    return min.(max.(_guess, m), M)
 end
 
 function getwindow(object_width) 
@@ -34,11 +35,14 @@ function track(file::AbstractString, start::Real, stop::Real; start_location::Un
     seek(vid, start)
     σ = object_width/2.355
     guess, initial_window = initialize(start_location, vid, object_width)
-    coords = [get_next(guess, read(vid), initial_window, σ)]
+    sz = reverse(out_frame_size(vid))
+    coords = [get_next(guess, read(vid), initial_window, σ, 1, sz)]
     t = [gettime(vid)]
     window = getwindow(object_width)
+    m = first(Tuple(last(window))) + 2
+    M = sz .- m
     for img in vid
-        push!(coords, get_next(coords[end], img, window, σ))
+        push!(coords, get_next(coords[end], img , window, σ, m, M))
         push!(t, gettime(vid))
         if t[end] ≥ stop
             break
