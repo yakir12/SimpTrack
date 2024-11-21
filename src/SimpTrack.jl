@@ -28,7 +28,7 @@ initialize(start_location, _, object_width) = (start_location, getwindow(object_
 
 function track(file::AbstractString, start::Real, stop::Real; start_location::Union{Missing, NTuple{2, Int}} = missing, object_width::Int = 60)
     vid = openvideo(file, target_format=VideoIO.AV_PIX_FMT_GRAY8)
-    read(vid)
+    img = read(vid)
     t₀ = gettime(vid)
     start += t₀
     stop += t₀
@@ -41,13 +41,15 @@ function track(file::AbstractString, start::Real, stop::Real; start_location::Un
     window = getwindow(object_width)
     m = first(Tuple(last(window))) + 2
     M = sz .- m
-    for img in vid
+    while !eof(vid)
+        read!(vid, img)
         push!(coords, get_next(coords[end], img , window, σ, m, M))
         push!(t, gettime(vid))
         if t[end] ≥ stop
             break
         end
     end
+    close(vid)
     return t .- t₀, coords
 end
 
